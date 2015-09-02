@@ -1,0 +1,166 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li ><a href="/">Overview </a></li>
+                <li><a href="/reports/">Region Demographics</a></li>
+                <li><a href="/analytics/">Time Analytics</a></li>
+                <li><a href="/export">Browser Usage</a></li>
+                <li><a href="/pageViews/">Page Views</a></li>
+                <li><a href="/demogra/">Demographics</a></li>
+            </ul>
+        </div>
+
+
+
+    </div>
+</div>
+
+
+<div style="width:90%;padding-top: 2%;padding-left:20%">
+    <form action="">
+        StartDate:<input type="text" value="2012-01-01" name="startDate" id="datepicker">
+        End Date:<input type="text" name="endDate" id="datepicker2" value="2015-01-01">
+        Dimension:
+        <select name='dimension' id="selectMenu">
+            <option value="continent">Continent</option>
+            <option value="subContinent">Sub Continent</option>
+            <option value="country">Country</option>
+            <option value="region">Region</option>
+            <option value="metro">Metro</option>
+            <option value="city">City</option>
+        </select>
+        Metric:
+        <select name='metric' value = "Bounces" id="metricMenu">
+            <option value="users">Users</option>
+            <option value="newusers">New Users</option>
+            <option value="bounces">Bounces</option>
+            <option value="hits">Hits</option>
+            <option value="avgPageLoadTime">Average Page Load Time</option>
+            <option value="sessions">Sessions</option>
+            <option value="avgTimeOnPage">Avg Time On Page</option>
+            <option value="avgDomainLookupTime">Avg Domain Lookup Time</option>
+            <option value="avgPageDownloadTime">Avg Page Download Time</option>
+            <option value="avgServerConnectionTime">Avg Server Connection Time</option>
+            <option value="avgDomInteractiveTime">Avg Dom Interactive Time</option>
+
+        </select>
+        <input type="submit" value="Submit">
+       
+    </form>
+</div>
+
+
+<div id="contain"><h1>Region Demographics</h1></div>
+<script src="http://d3js.org/d3.v3.min.js"><script>
+    $(function() {
+        $( "#metricMenu" ).val("KJDFL");
+    });
+</script>
+    <script>
+        $(function() {
+            $( "#slider-page" ).slider({
+                range: "min",
+                value: 1,
+                min: 1,
+                max: 20,
+                slide: function( event, ui ) {
+                    $( "#page" ).val( "" + ui.value );
+                }
+            });
+            $( "#page" ).val( "" + $( "#slider-page" ).slider( "value" ) );
+        });
+    </script>
+    <script>
+        $(function() {
+            $( "#slider-range-min" ).slider({
+                range: "min",
+                value: "{{maxResultsReturned}}",
+                min: 5,
+                max: 20,
+                slide: function( event, ui ) {
+                    $( "#amount" ).val( "" + ui.value );
+                }
+            });
+            $( "#amount" ).val( "" + $( "#slider-range-min" ).slider( "value" ) );
+        });
+    </script>
+<!--    <script>
+        $(function() {
+            $( "#datepicker" ).datepicker();
+            $( "#datepicker" ).datepicker( "option", "dateFormat", 'yy-mm-dd' );
+        });
+        $(function() {
+            $(function () {
+                $("#datepicker2").datepicker();
+                $("#datepicker2").datepicker("option", "dateFormat", 'yy-mm-dd');
+            });
+        });
+    </script>-->
+    <script>
+
+        var margin = {top: 20, right: 20, bottom: 30, left: 40},
+                width = 800 - margin.left - margin.right,
+                height = 425 - margin.top - margin.bottom;
+
+        var x = d3.scale.ordinal()
+                .rangeRoundBands([0, width], .1);
+
+        var y = d3.scale.linear()
+                .range([height, 0]);
+
+        var xAxis = d3.svg.axis()
+                .scale(x)
+                .orient("bottom");
+
+        var yAxis = d3.svg.axis()
+                .scale(y)
+                .orient("left")
+                .ticks(10, "%");
+
+        var svg = d3.select("#contain").append("svg")
+                .attr("width", width + margin.left + margin.right)
+                .attr("height", height + margin.top + margin.bottom)
+                .append("g")
+                .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+        d3.tsv("/static/dataFiles/home.tsv", type, function(error, data) {
+            x.domain(data.map(function(d) { return d.letter; }));
+            y.domain([0, d3.max(data, function(d) { return d.frequency; })]);
+
+            svg.append("g")
+                    .attr("class", "x axis")
+                    .attr("transform", "translate(0," + height + ")")
+                    .call(xAxis);
+
+            svg.append("g")
+                    .attr("class", "y axis")
+                    .call(yAxis)
+                    .append("text")
+                    .attr("transform", "rotate(-90)")
+                    .attr("y", 6)
+                    .attr("dy", ".71em")
+                    .style("text-anchor", "end")
+                    .text("Frequency");
+
+            svg.selectAll(".bar")
+                    .data(data)
+                    .enter().append("rect")
+                    .attr("class", "bar")
+                    .attr("x", function(d) { return x(d.letter); })
+                    .attr("width", x.rangeBand())
+                    .attr("y", function(d) { return y(d.frequency); })
+                    .attr("height", function(d) { return height - y(d.frequency); });
+
+        });
+
+        function type(d) {
+            d.frequency = +d.frequency;
+            return d;
+        }
+
+    </script>
+
+    {% endblock %}

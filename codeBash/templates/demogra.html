@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li ><a href="/">Overview </a></li>
+                <li><a href="/reports/">Region Demographics</a></li>
+                <li><a href="/analytics/">Time Analytics</a></li>
+                <li><a href="/export">Browser Usage</a></li>
+                <li><a href="/pageViews/">Page Views</a></li>
+                <li><a href="/demogra/">Demographics</a></li>
+            </ul>
+        </div>
+
+
+
+    </div>
+</div>
+
+<style>
+
+
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width: 960px;
+  height: 500px;
+  position: relative;
+}
+path.slice{
+        stroke-width:2px;
+}
+polyline{
+        opacity: .3;
+        stroke: black;
+        stroke-width: 2px;
+        fill: none;
+} 
+svg text.percent{
+        fill:white;
+        text-anchor:middle;
+Interval:
+  <option value="nthMonth">Month</option>
+  <option value="nthWeek">Week</option>
+  <option value="nthDay">Day</option>
+</select>
+
+        font-size:12px;
+}
+
+#contain{
+	margin-left:30%;
+}
+
+</style>
+
+
+<!--<div style="width:90%;padding-top: 5px;text-align: center;">
+<form action="">
+    StartDate: <input type="text" id="datepicker" name="startDate" value="2012-01-01">
+    End Date:<input type="text" id="datepicker2"
+ <select name="metric" id="selectMenu">
+Metric:
+  <option value="users">Users</option>
+  <option value="newusers">New Users</option>
+  <option value="bounces">Bounces</option>
+  <option value="hits">Hits</option> name="endDate" value="2015-01-01">
+ <select name="days" id="daysSelectMenu">
+<option value="sessions">Sessions</option>
+<option value="avgTimeOnPage">Avg Time On Page</option>
+<option value="avgDomainLookupTime">Avg Domain Lookup Time</option>
+<option value="avgPageDownloadTime">Avg Page Download Time</option>
+<option value="avgServerConnectionTime">Avg Server Connection Time</option>
+<option value="avgDomInteractiveTime">Avg Dom Interactive Time</option>
+</select>-->
+    <!--Number of results: <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+<input type="submit" value="Submit">-->
+
+<div id="contain"><h2>Java Installed</h2></div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script src="/static/javascript/Donut3D.js"></script>
+<script>
+
+var salesData=[
+	{label:"Yes", value:"{{ yes }}", color:"#3366CC"},
+	{label:"No", value:"{{ no }}", color:"#DC3912"},
+];
+
+var svg = d3.select("#contain").append("svg").attr("width",700).attr("height",300);
+
+svg.append("g").attr("id","salesDonut");
+svg.append("g").attr("id","quotesDonut");
+
+Donut3D.draw("salesDonut", salesData, 150, 150, 130, 100, 30, 0.4);
+
+</script>
+
+
+{% endblock %}

@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li><a href="/">Overview </a></li>
+                <li><a href="/reports/">Region Demographics</a></li>
+                <li><a href="/analytics/">Time Analytics</a></li>
+                <li><a href="/export">Browser Usage</a></li>
+                <li><a href="/pageViews/">Page Views</a></li>
+                <li><a href="/demogra/">Demographics</a></li>
+            </ul>
+        </div>
+
+
+    </div>
+</div>
+
+<div style="width:90%;padding-top: 5px;text-align: center;">
+    <form action="">
+        StartDate: <input type="text" id="datepicker" name="startDate" value="2012-01-01">
+        End Date:<input type="text" id="datepicker2" name="endDate" value="2015-01-01">
+        <!--Days:<input type="text" name='days'>-->
+        <select name="days" id="daysSelectMenu">
+            Interval:
+            <option value="nthMonth">Month</option>
+            <option value="nthWeek">Week</option>
+            <option value="nthDay">Day</option>
+        </select>
+
+        <select name="metric" id="selectMenu">
+            Metric:
+            <option value="users">Users</option>
+            <option value="newusers">New Users</option>
+            <option value="bounces">Bounces</option>
+            <option value="hits">Hits</option>
+            <option value="sessions">Sessions</option>
+            <option value="avgTimeOnPage">Avg Time On Page</option>
+            <option value="avgDomainLookupTime">Avg Domain Lookup Time</option>
+            <option value="avgPageDownloadTime">Avg Page Download Time</option>
+            <option value="avgServerConnectionTime">Avg Server Connection Time</option>
+            <option value="avgDomInteractiveTime">Avg Dom Interactive Time</option>
+        </select>
+        <!--Number of results: <input type="text" id="amount" readonly style="border:0; color:#f6931f; font-weight:bold;">
+    <input type="submit" value="Submit">-->
+        <input type="submit" value="Submit">
+    </form>
+</div>
+
+
+<div id="contain"><h1>Time Analytics</h1></div>
+<script src="http://d3js.org/d3.v3.min.js"></script>
+<script src="http://d3js.org/queue.v1.min.js"></script>
+<script src="http://d3js.org/topojson.v1.min.js"></script>
+<script>
+
+
+    var margin = {top: 20, right: 20, bottom: 30, left: 50},
+            width = 800 - margin.left - margin.right,
+            height = 370 - margin.top - margin.bottom;
+
+    var parseDate = d3.time.format("%Y-%m-%d").parse;
+
+    var x = d3.time.scale()
+            .range([0, width]);
+
+    var y = d3.scale.linear()
+            .range([height, 0]);
+
+    var xAxis = d3.svg.axis()
+            .scale(x)
+            .orient("bottom");
+
+    var yAxis = d3.svg.axis()
+            .scale(y)
+            .orient("left");
+
+    var area = d3.svg.area()
+            .x(function (d) {
+                return x(d.date);
+            })
+            .y0(height)
+            .y1(function (d) {
+                return y(d.close);
+            });
+
+    var svg = d3.select("#contain").append("svg")
+            .attr("width", width + margin.left + margin.right)
+            .attr("height", height + margin.top + margin.bottom)
+            .append("g")
+            .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    d3.tsv("/static/dataFiles/analytics.tsv", function (error, data) {
+        data.forEach(function (d) {
+            d.date = parseDate(d.date);
+            d.close = +d.close;
+        });
+
+        x.domain(d3.extent(data, function (d) {
+            return d.date;
+        }));
+        y.domain([0, d3.max(data, function (d) {
+            return d.close;
+        })]);
+
+        svg.append("path")
+                .datum(data)
+                .attr("class", "area")
+                .attr("d", area);
+
+        svg.append("g")
+                .attr("class", "x axis")
+                .attr("transform", "translate(0," + height + ")")
+                .call(xAxis);
+
+        svg.append("g")
+                .attr("class", "y axis")
+                .call(yAxis)
+                .append("text")
+                .attr("transform", "rotate(-90)")
+                .attr("y", 6)
+                .attr("dy", ".71em")
+                .style("text-anchor", "end")
+                .text("Units");
+    });
+
+
+</script>
+
+
+{% endblock %}
